@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Razorpay Payment</title>
+  </head>
+  <body>
+    <h1>Buy Product</h1>
+    <button id="payBtn">Pay ₹700</button>
+
+    <!-- Razorpay SDK -->
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+    <script>
+      document.getElementById("payBtn").onclick = async function () {
+        // Create order on backend
+        const res = await fetch("/razorpay/create-order", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ userId: 3, amount: 55 }),
+        });
+
+        const data = await res.json();
+        console.log("data created by ordered", data);
+        const order = data.order;
+        const razorpayKey = data.key; // ✅ Make sure to send key from backend
+
+        const options = {
+          key: razorpayKey, // ✅ Dynamic key instead of hardcoded <%= %>
+          amount: order.amount,
+          currency: order.currency || "INR",
+          name: order.name || "Test User",
+          description: "Test Transaction",
+          order_id: order.id,
+
+          // ✅ Handler called only on successful payment
+          handler: async function (response) {
+            try {
+              const verifyRes = await fetch("/razorpay/verify-payment", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  razorpayPaymentId: response.razorpay_payment_id,
+                  orderId: response.razorpay_order_id,
+                  razorpaySignature: response.razorpay_signature,
+                }),
+              });
+
+              const result = await verifyRes.json();
+              console.log("payment.ejs result>>> ", result);
+              if (result.success) {
+                alert("✅ Payment successful!");
+              } else {
+                alert("❌ Payment failed: " + result.message);
+              }
+            } catch (error) {
+              console.error("Verification error:", error);
+              alert("❌ Something went wrong during payment verification.");
+            }
+          },
+
+          prefill: {
+            name: order.name || "Test User",
+            email: order.email || "test@example.com",
+          },
+
+          notes: {
+            address: "21st Century Business Center",
+          },
+
+          theme: {
+            color: "#3399cc",
+          },
+
+          modal: {
+            ondismiss: async function () {
+              console.warn("Payment popup closed by user.");
+
+              // OPTIONAL: Tell backend the payment was cancelled
+              try {
+                await fetch("/razorpay/cancel-payment", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ orderId: order.id }),
+                });
+                console.log("cancelled payment");
+              } catch (err) {
+                console.error("Failed to notify server of payment cancel", err);
+              }
+
+              // Show user message
+              alert("❌ Payment was cancelled. No amount was deducted.");
+            },
+          },
+        };
+
+        const rzp = new Razorpay(options);
+        console.log("rzp >> let's check >> ", rzp);
+        rzp.open();
+      };
+    </script>
+  </body>
+</html>
