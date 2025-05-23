@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Socket.IO Chat</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 0; padding: 0; background: #f2f2f2; }
+    #chat { max-width: 600px; margin: 20px auto; background: white; padding: 10px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+    #messages { list-style: none; padding: 0; height: 300px; overflow-y: scroll; border-bottom: 1px solid #ddd; margin-bottom: 10px; }
+    #messages li { padding: 5px 10px; }
+    #typing { color: gray; font-size: 14px; }
+    input { padding: 10px; width: 100%; box-sizing: border-box; font-size: 16px; }
+  </style>
+</head>
+<body>
+  <div id="chat">
+    <ul id="messages"></ul>
+    <p id="typing"></p>
+    <input id="input" autocomplete="off" placeholder="Type your message..." />
+  </div>
+
+  <!-- Load socket.io from server -->
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const socket = io();
+
+    let username;
+    const messages = document.getElementById("messages");
+    const input = document.getElementById("input");
+    const typingEl = document.getElementById("typing");
+
+    // Ask for username
+    while (!username) {
+      username = prompt("Enter your name:");
+    }
+
+    // Notify server of new user
+    socket.emit("add user", username);
+
+    // Send message
+    input.addEventListener("keypress", () => {
+      socket.emit("typing");
+    });
+
+    input.addEventListener("keyup", (e) => {
+      if (e.key === "Enter" && input.value.trim()) {
+        socket.emit("new message", input.value);
+        addMessage({ username: "You", message: input.value });
+        input.value = "";
+        socket.emit("stop typing");
+      }
+    });
+
+    // Receive new message from others
+    socket.on("new message", (data) => {
+      addMessage(data);
+    });
+
+    // Show typing
+    socket.on("typing", (data) => {
+      typingEl.textContent = `${data.username} is typing...`;
+    });
+
+    socket.on("stop typing", () => {
+      typingEl.textContent = "";
+    });
+
+    // User joined/left
+    socket.on("user joined", (data) => {
+      addMessage({ username: "System", message: `${data.username} joined the chat` });
+    });
+
+    socket.on("user left", (data) => {
+      addMessage({ username: "System", message: `${data.username} left the chat` });
+    });
+
+    function addMessage({ username, message }) {
+      const li = document.createElement("li");
+      li.innerHTML = `<strong>${username}:</strong> ${message}`;
+      messages.appendChild(li);
+      messages.scrollTop = messages.scrollHeight;
+    }
+  </script>
+</body>
+</html>

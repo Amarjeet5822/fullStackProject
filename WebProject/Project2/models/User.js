@@ -1,32 +1,33 @@
-// models/User.js
-const { DataTypes } = require("sequelize");
-const sequelize = require("../config/db");
-
-const User = sequelize.define("User", {
-    id: {
-      type: DataTypes.INTEGER,
-      primaryKey: true,
-      autoIncrement: true,
-    },
-    name: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    email: {
-      type: DataTypes.STRING,
-      unique: true,
-      allowNull: false,
-    },
-    city: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-  },
-  {
-    tableName: "users",
-    timestamps: false,
+'use strict';
+const {
+  Model
+} = require('sequelize');
+module.exports = (sequelize, DataTypes) => {
+  class User extends Model {
+    /**
+     * Helper method for defining associations.
+     * This method is not a part of Sequelize lifecycle.
+     * The `models/index` file will call this method automatically.
+     */
+    static associate(models) {
+      // define association here
+      // A user can have many posts
+      User.hasMany(models.Blog, {
+        foreignKey: 'userId',
+        as: 'blogs',
+        onDelete: 'CASCADE',
+      });
+    }
   }
-);
-
-module.exports = User;
+  User.init({
+    firstName: DataTypes.STRING,
+    lastName: DataTypes.STRING,
+    email: DataTypes.STRING,
+  }, {
+    sequelize,
+    modelName: 'User',
+    tableName:"users",
+  });
+  return User;
+};
 

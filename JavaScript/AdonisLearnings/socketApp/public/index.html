@@ -1,0 +1,51 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Group Chat</title>
+</head>
+<body>
+  <input id="roomInput" placeholder="Enter Room ID">
+  <h2 class="roomNumber"></h2>
+  <button onclick="joinRoom()">Join Room</button>
+
+  <br><br>
+
+  <input id="msgInput" placeholder="Enter Message">
+  <button onclick="sendMessage()">Send</button>
+
+  <ul id="messages"></ul>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const socket = io();
+    let currentRoom = "";
+
+    function joinRoom() {
+      const room = document.getElementById('roomInput');
+      currentRoom = room.value;
+      room.value = "";
+      document.getElementsByClassName("roomNumber")[0].textContent = `Room ${currentRoom}`;
+      socket.emit('join_room', currentRoom);
+    }
+
+    function sendMessage() {
+      const message = document.getElementById('msgInput');
+      console.log("currentRoom", {room: currentRoom});
+      socket.emit('send_message', {
+        room: currentRoom,
+        message: message.value,
+        sender: 'You'
+      });
+      message.value = "";
+    }
+
+    socket.on('receive_message', (data) => {
+      const li = document.createElement('li');
+      li.textContent = `${data.sender}: ${data.message}`;
+      document.getElementById('messages').appendChild(li);
+    });
+
+  </script>
+</body>
+</html>

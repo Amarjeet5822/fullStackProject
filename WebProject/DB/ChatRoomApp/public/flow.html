@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Socket.IO Demo</title>
+</head>
+<body>
+  <h2>Socket.IO Chat</h2>
+  <div id="messages"></div>
+
+  <input id="msgInput" placeholder="Type message..." />
+  <button onclick="sendMessage()">Send</button>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const socket = io();
+
+    const messagesDiv = document.getElementById("messages");
+    const msgInput = document.getElementById("msgInput");
+
+    function appendMessage(text) {
+      const div = document.createElement("div");
+      div.textContent = text;
+      messagesDiv.appendChild(div);
+    }
+
+    socket.on("welcome", (msg) => {
+      appendMessage("🔵 " + msg);
+    });
+
+    socket.on("user-joined", (msg) => {
+      appendMessage("🟢 " + msg);
+    });
+
+    socket.on("user-left", (msg) => {
+      appendMessage("🔴 " + msg);
+    });
+
+    socket.on("chat-message", (msg) => {
+      appendMessage("💬 " + msg);
+    });
+
+    function sendMessage() {
+      const msg = msgInput.value;
+      socket.emit("chat-message", msg);
+      appendMessage("🧍 You: " + msg);
+      msgInput.value = "";
+    }
+  </script>
+</body>
+</html>

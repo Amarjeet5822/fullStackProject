@@ -2,20 +2,23 @@ const express = require("express");
 const { sendWebEmail } = require("../services/mailer");
 const path = require("path");
 const ejs = require("ejs");
-const emailQueue = require("../queue/emailQueue");
+const mainQueue = require("../queue/mainQueue");
+const sendBulkEmails = require("../controllers/sendBulkMailController");
 
 const emailRoute = express.Router();
 
 emailRoute.post("/bull-mail", async (req, res) => {
   const { to, subject, body } = req.body;
   try {
-    await emailQueue.add({taskName: "add",  to, subject, body });
+    await mainQueue.add({taskName: "sendMail",  to, subject, body });
     console.log("emailRoute email added to queue");
     res.status(200).json({message: "Email job added to queue" });
   } catch (error) {
     res.status(500).json({error: "Something went wrong", err: error?.message})
   }
-})
+});
+
+emailRoute.post("/all", sendBulkEmails );
 
 emailRoute.post("/", async (req, res) => {
   try {

@@ -12,22 +12,23 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-const sendWebEmail = async (to, subject, html, imgPath) => {
+const sendWebEmail = async (to, subject, html, ...arg) => {
   try {
+    console.log("sendWebEmail LLL ", arg);
     const info = await transporter.sendMail({
       from: "amarjeetg050@gmail.com",
-      to: [to, "patelarpit2580@gmail.com"],
-      bcc: ["amarjeetgupta050@gmail.com"],
+      to,
+      // bcc: ["amarjeetgupta050@gmail.com"],
       subject,
       html,
-      attachments: [
-        {
-          filename: "flower as attachment",
-          contentType: "image/jpeg",
-          path: imgPath,
-          // cid: "uniqueImageId" // Matches the "cid" in EJS template
-        },
-      ],
+      // attachments: [
+      //   {
+      //     filename: "flower as attachment",
+      //     contentType: "image/jpeg",
+      //     path: imgPath,
+      //     // cid: "uniqueImageId" // Matches the "cid" in EJS template
+      //   },
+      // ],
       attachDataUrls: true,
     });
 

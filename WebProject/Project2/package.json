@@ -4,16 +4,27 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "server": "nodemon app.js"
+    "server": "nodemon app.js",
+    "migrate": "npx sequelize-cli db:migrate",
+    "migrate:undo": "npx sequelize-cli db:migrate:undo",
+    "migrate:undo:all": "npx sequelize-cli db:migrate:undo:all",
+    "seed": "npx sequelize-cli db:seed:all",
+    "seed:undo": "npx sequelize-cli db:seed:undo:all"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "arena": "^0.0.2",
-    "axios": "^1.9.0",
+    "@aws-sdk/client-s3": "^3.812.0",
+    "@aws-sdk/s3-presigned-post": "^3.812.0",
+    "@bull-board/api": "^6.9.6",
+    "@bull-board/express": "^6.9.6",
+    "@bull-board/ui": "^6.9.6",
+    "aws-sdk": "^2.1692.0",
+    "body-parser": "^2.2.0",
     "bull": "^4.16.5",
+    "bull-arena": "^4.5.1",
     "cors": "^2.8.5",
     "crypto": "^1.0.1",
     "dotenv": "^16.5.0",
@@ -27,5 +38,8 @@
     "razorpay": "^2.9.6",
     "redis": "^5.0.1",
     "sequelize": "^6.37.7"
+  },
+  "devDependencies": {
+    "sequelize-cli": "^6.6.3"
   }
 }

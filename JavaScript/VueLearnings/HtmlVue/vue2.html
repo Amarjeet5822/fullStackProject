@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Second Page</title>
+    <style>
+      * {
+        padding: 0%;
+        margin: 0;
+        box-sizing: border-box;
+      }
+      .pinkBG {
+        background-color: lightblue;
+        text-align: center;
+      }
+      .btnCount {
+        margin-top: 10px;
+        padding: 10px 20px;
+        border-radius: 10px;
+        border: none;
+      }
+      .boxBtn {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 20px;
+      }
+      button:hover {
+        background-color: #ccc;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+        border: 1px solid gray;
+      }
+      .centreCnt {
+        display: flex;
+        justify-content: center;
+        font-size: larger;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app">
+      <div v-bind:class="vueClass">{{message}}</div>
+      <div>Second Page</div>
+      <div v-bind:class="vueClass">Count: {{ count }}</div>
+      <div v-bind:class="vueBoxBtn">
+        <div>
+          <button v-bind:class="countClass" @click="incrementCount">
+            Increment
+          </button>
+        </div>
+        <div>
+          <button v-bind:class="countClass" @click="decrementCount">
+            Decrement
+          </button>
+        </div>
+        <div>
+          <button v-bind:class="countClass" @click="resetCount">Reset</button>
+        </div>
+      </div>
+    </div>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script>
+      const app = Vue.createApp({
+        data() {
+          return {
+            vueClass: "pinkBG centreCnt",
+            vueBoxBtn: "boxBtn",
+            message: "This is the second page.",
+            count: localStorage.getItem("count") || 0,
+            countClass: "btnCount",
+          };
+        },
+        methods: {
+          incrementCount() {
+            if (this.count <20) {
+              this.count++;
+              localStorage.setItem("count", this.count);
+            } else {
+              this.count=0;
+              localStorage.setItem('count', 0);
+            }
+          },
+          decrementCount() {
+            if (this.count >0 ){
+              this.count--;
+              localStorage.setItem("count", this.count);
+            } else {
+              this.count = 20;
+              localStorage.setItem("count", 20);
+            }
+          },
+          resetCount() {
+            this.count = 0;
+            localStorage.setItem("count", this.count);
+          },
+        },
+      });
+      app.mount("#app");
+    </script>
+  </body>
+</html>

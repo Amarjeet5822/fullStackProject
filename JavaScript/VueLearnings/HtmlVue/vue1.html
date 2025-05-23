@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My first Vue Page</title>
+  </head>
+  <body>
+    <!-- 1. Data Binding syntax in Vue.js -->
+    <div id="app">
+      {{message}}
+      <!-- Bind Text -->
+      <br />
+      {{`Random number: ` + Math.ceil(Math.random()*50)}}
+      <div>
+        <img :src="myImageUrl" alt="Amarjeet Image" width="100" />
+        <!-- Bind Attribute :src -->
+        <a :href="googleUrl">click for Google</a>
+      </div>
+      <p :style="{color: textColor }">Let's seed style in p tag.</p>
+      <!-- 2. Event Handling -->
+      <h2>2. Event Handling</h2>
+      <p>You've clicked {{ counter }} times.</p>
+      <button @click="incrementHandler">Click</button>
+
+      <!-- 3. List Rendering  -->
+      <h2>3. List Rendering</h2>
+      <ul>
+        {{items}}
+        <li v-for="(item, index, items) in items" :key="index">
+          {{ index+1 }}. {{item }}
+        </li>
+      </ul>
+    </div>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script>
+      const app = Vue.createApp({
+        data() {
+          return {
+            message: "Hello Vue, I'm Amarjeet Gupta",
+            myImageUrl:
+              "https://assets.leetcode.com/users/Amarjeet_G/avatar_1710394864.png",
+            googleUrl: "www.Google.com",
+            counter: 0,
+            textColor: "red",
+            items: ["Mango", "Orange", "Grapes", "Pineapple"],
+          };
+        },
+        methods: {
+          incrementHandler() {
+            this.counter++;
+          },
+        },
+      });
+      app.mount("#app");
+    </script>
+  </body>
+</html>

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>S3 Upload</title>
+  </head>
+  <body>
+    <h2>Upload File to AWS S3</h2>
+    <input type="file" id="fileInput" />
+    <button onclick="uploadFile()">Upload</button>
+
+    <div id="message"></div>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+      async function uploadFile() {
+        const fileInput = document.getElementById("fileInput");
+        const file = fileInput.files[0];
+
+        if (!file) {
+          alert("Please select a file");
+          return;
+        }
+
+        const contentType = file.type || "application/octet-stream";
+        console.log("contentType ::>>", contentType);
+        try {
+          const res = await axios.post(
+            `http://localhost:8080/aws/pre-signed-url?filename=${encodeURIComponent(
+              file.name
+            )}&type=${encodeURIComponent(contentType)}`
+          );
+
+          const { url, fields} = res.data;
+          const formData = new FormData();
+
+          Object.entries(fields).forEach(([key, value]) => {
+            formData.append(key, value);
+          });
+          formData.append("file", file);
+
+          await axios.post(url, formData, {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          });
+
+          const fileUrl = `https://${fields.bucket}.s3.amazonaws.com/${fields.key}`;
+          document.getElementById(
+            "message"
+          ).innerHTML = `✅ Uploaded: <a href="${fileUrl}" target="_blank">${fileUrl}</a>`;
+        } catch (err) {
+          console.error("Upload error:", err);
+          document.getElementById("message").innerText = "❌ Upload failed";
+        }
+      }
+    </script>
+  </body>
+</html>

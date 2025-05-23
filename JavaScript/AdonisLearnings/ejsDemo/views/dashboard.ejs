@@ -1,0 +1,16 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Dashboard</title>
+</head>
+<body>
+  <h2>Welcome, <%= username %> 👋</h2>
+  <h3>Your Messages:</h3>
+  <ul>
+    <% messages.forEach((msg) => { %>
+      <li><%= msg %></li>
+    <% }) %>
+  </ul>
+</body>
+</html>
